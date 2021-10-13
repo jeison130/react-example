@@ -7,7 +7,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
 } from 'react-router-dom'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
@@ -21,6 +21,23 @@ function App() {
       setUsuarios(response.data);
     });
   }, [setUsuarios]);
+
+  const guardarUsuario = (event) => {
+    event.preventDefault();
+    const form = event.target;
+
+    const data = {
+      nombres: form.nombres.value,
+      apellidos: form.apellidos.value,
+      email: form.email.value,
+      contrasena: form.contrasena.value,
+    };
+
+    axios.post('http://localhost:5000/usuarios', data)
+      .then((response) => {
+        window.history.back();
+      });
+  }
   
   return (
     <Router>
@@ -43,8 +60,9 @@ function App() {
         </nav>
 
         <Switch>
-          <Route path="/usuarios">
+          <Route exact path="/usuarios">
             Usuarios
+            <Link to="/usuarios/crear">Crear usuario</Link>
             <table>
               <thead>
               <tr>
@@ -67,11 +85,34 @@ function App() {
             </table>
           </Route>
 
-          <Route path="/encuestas">
+          <Route exact path="/usuarios/crear">
+            <Link to="/usuarios">Volver</Link>
+            <form onSubmit={guardarUsuario}>
+              <input 
+                type="text" 
+                placeholder="Nombres" 
+                name="nombres"></input>
+              <input 
+                type="text" 
+                placeholder="Apellidos" 
+                name="apellidos"></input>
+              <input 
+                type="email" 
+                placeholder="Email" 
+                name="email"></input>
+              <input 
+                type="password" 
+                placeholder="Contraseña" 
+                name="contrasena"></input>
+                <button type="submit">Guardar</button>
+            </form>
+          </Route>
+
+          <Route exact path="/encuestas">
             <p>En la pagina de encuestas</p>
           </Route>
 
-          <Route path="/secciones">
+          <Route exact path="/secciones">
             <p>En la pagina de secciones</p>
           </Route>
 
