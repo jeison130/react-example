@@ -14,13 +14,20 @@ import {
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import constantes from './constantes'
+import Login from './pages/login';
 
 // funciones y hooks
 function App() {
   const [ usuarios, setUsuarios ] = useState([]);
+  const isUser = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get(constantes.URL_SERVIDOR + '/usuarios').then((response) => {
+    axios.get(constantes.URL_SERVIDOR + '/usuarios', {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('token')
+      }
+    })
+      .then((response) => {
       setUsuarios(response.data);
     });
   }, [setUsuarios]);
@@ -36,12 +43,30 @@ function App() {
       contrasena: form.contrasena.value,
     };
 
-    axios.post('http://localhost:5000/usuarios', data)
+    axios.post('http://localhost:5000/usuarios', data, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem('token')
+      }
+    })
       .then((response) => {
         window.history.back();
       });
   }
   
+  let menu = '';
+
+  if(isUser) {
+      menu = <><li className="nav-item">
+              <Link className="nav-link" to='/usuarios'>Usuarios</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to='/encuestas'>Encuestas</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to='/secciones'>Secciones</Link>
+            </li></>
+  }
+
   return (
     <Router>
       <div>
@@ -56,15 +81,8 @@ function App() {
               <li className="nav-item">
                 <Link className="nav-link active" to='/'>Inicio</Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to='/usuarios'>Usuarios</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to='/encuestas'>Encuestas</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to='/secciones'>Secciones</Link>
-              </li>
+
+              {menu}
             </ul>
           </div>
         </div>
@@ -168,6 +186,10 @@ function App() {
 
           <Route exact path="/secciones">
             <p>En la pagina de secciones</p>
+          </Route>
+
+          <Route exact path="/login">
+            <Login></Login>
           </Route>
 
           <Route path="/">
